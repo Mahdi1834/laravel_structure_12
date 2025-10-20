@@ -3,14 +3,18 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable ,HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +25,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'start_at'
     ];
 
     /**
@@ -34,15 +39,40 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'start_at' => 'date:Y-m-d',
+    ];
+
+
+
+    protected function startAtFormatted(): Attribute{
+        return Attribute::make(
+            get:fn(string $val) => Carbon::parse($val)->format('m/d/Y'),
+            set:fn(string $val) => $val,
+        );
+    }
+
+    // ارتباط با نقش‌ها (Many-to-Many)
+    public function roles()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->belongsToMany(Role::class, 'role_user');
+    }
+
+    // ارتباط با پروژه‌ها
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
+
+    // ارتباط با دسته‌بندی‌ها
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
     }
 }
