@@ -14,7 +14,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable ,HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -51,10 +51,11 @@ class User extends Authenticatable
 
 
 
-    protected function startAtFormatted(): Attribute{
+    protected function startAt(): Attribute
+    {
         return Attribute::make(
-            get:fn(string $val) => Carbon::parse($val)->format('m/d/Y'),
-            set:fn(string $val) => $val,
+            get: fn($value) => $value ? Carbon::parse($value)->format('m/d/Y') : null,
+            set: fn($value) => $value ? Carbon::createFromFormat('m/d/Y', $value)->format('Y-m-d') : null,
         );
     }
 

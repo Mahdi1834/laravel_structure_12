@@ -32,7 +32,7 @@ class UserController extends Controller
         $userData = $request->validated();
 
 
-        $userData['start_at'] = Carbon::createFromFormat('m/d/y', $userData['start_at'])->format('Y-m-d');
+        // $userData['start_at'] = Carbon::createFromFormat('m/d/y', $userData['start_at'])->format('Y-m-d');
 
         $roles = $userData['roles'] ?? [];
         $user = $createUserAction->execute($userData, $roles);
